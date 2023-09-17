@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  employeeId Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  email String @unique
+  hash  String
+
+  ic               String   @unique
+  firstName        String
+  lastName         String
+  dob              DateTime
+  gender           String
+  nationality      String
+  phoneNo          String
+  emergencyNo      String?
+  emergencyRemarks String?
+
+  title     String
+  specialty String?
+
+  appointments Appointment[]
+}
+
+model Patient {
+  patientId Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ic               String   @unique
+  firstName        String
+  lastName         String
+  dob              DateTime
+  gender           String
+  nationality      String
+  phoneNo          String
+  email            String   @unique
+  emergencyNo      String?
+  emergencyRemarks String?
+  remarks          String?
+
+  appointments Appointment[]
+}
+
+model Appointment {
+  appointmentId        Int      @id @default(autoincrement())
+  registrationDateTime DateTime @default(now())
+
+  patientId           Int
+  employeeId          Int
+  appointmentDateTime DateTime
+
+  reason    String?
+  remarks   String?
+  completed Boolean @default(false)
+
+  diagnoses Diagnosis[]
+
+  patient  Patient  @relation(fields: [patientId], references: [patientId])
+  employee Employee @relation(fields: [employeeId], references: [employeeId])
+}
+
+model Diagnosis {
+  diagnosisId Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  appointmentId Int
+
+  icd      String
+  symptoms String?
+  remarks  String?
+
+  appointment Appointment @relation(fields: [appointmentId], references: [appointmentId])
+}
